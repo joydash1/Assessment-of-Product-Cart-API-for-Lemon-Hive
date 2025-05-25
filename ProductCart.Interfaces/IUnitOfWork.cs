@@ -8,7 +8,8 @@ namespace ProductCart.Interfaces
 {
     public interface IUnitOfWork
     {
-        //public IUsersRepository Users { get; }
+        public IProductRepository ProductRepository { get; }
+
         Task CommitAsync();
 
         Task RollbackAsync();

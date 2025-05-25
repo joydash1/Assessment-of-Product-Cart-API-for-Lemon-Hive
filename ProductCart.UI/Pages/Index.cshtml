@@ -1,0 +1,63 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+
+<div class="container">
+    <table class="table table-responsive table-info table-bordered">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>price</th>
+                <th>Slug</th>
+                <th>Date From</th>
+                <th>Date To</th>
+            </tr>
+        </thead>
+        <tbody id="tblProduct"></tbody>
+    </table>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        const apiUrl = '@Model.ApiUrl';
+        $.ajax({
+            url: apiUrl + "/api/Products/GetProductList",
+            method: "GET",
+            success: function (response) {
+                let products = response.data;
+                console.log(products);
+                let html = "";
+
+                products.forEach(function (product) {
+                    html += `<tr>
+                                <td>${product.productName}</td>
+                                <td>${product.productPrice}</td>
+                                <td>${product.productSlug}</td>
+                                <td>${product.discountStartDate ? formatDate(product.discountStartDate) : ""}</td>
+                                <td>${product.discountEndDate ? formatDate(product.discountEndDate) : ""}</td>
+                            </tr>`;
+                });
+
+                $("#tblProduct").html(html);
+            },
+            error: function (xhr) {
+                alert("Failed to load products");
+                console.error(xhr.responseText);
+            }
+        });
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        }
+    });
+</script>

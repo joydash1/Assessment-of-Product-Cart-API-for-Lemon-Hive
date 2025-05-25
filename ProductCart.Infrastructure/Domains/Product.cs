@@ -14,9 +14,8 @@ namespace ProductCart.Infrastructure.Domains
 
         public string ProductName { get; set; }
         public decimal ProductPrice { get; set; }
-        public string ProductImage { get; set; }
-        public DateTime EntryDate { get; set; }
-        public DateTime UpdateDate { get; set; }
-        public bool IsActive { get; set; }
+        public string ProductSlug { get; set; }
+        public DateTime? DiscountStartDate { get; set; }
+        public DateTime? DiscountEndDate { get; set; }
     }
 }
