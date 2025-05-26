@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace ProductCart.Interfaces
 {
-    public interface IProductRepository : IGenericRepository<Product>
+    public interface IProductRepository : IGenericRepository<Products>
     {
-        void Update(Product product);
+        void Update(Products product);
 
-        void UpdateRange(IEnumerable<Product> products);
+        void UpdateRange(IEnumerable<Products> products);
     }
 }

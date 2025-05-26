@@ -14,6 +14,6 @@ namespace ProductCart.Infrastructure
         {
         }
 
-        public DbSet<Product> Product { get; set; }
+        public DbSet<Products> Products { get; set; }
     }
 }

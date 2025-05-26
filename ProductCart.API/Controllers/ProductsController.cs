@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProductCart.Infrastructure.Domains;
 using ProductCart.Interfaces;
 using ProductCart.Services;
+using ProductCart.Shared.Helpers;
 
 namespace ProductCart.API.Controllers
 {
@@ -19,24 +20,45 @@ namespace ProductCart.API.Controllers
 
         [HttpGet]
         [Route("GetProductList")]
-        public async Task<IActionResult> GetAllProductsListAsync()
+        public async Task<IActionResult> GetAllProductsListAsync(string? ProductName = "")
         {
             var productList = await _context.ProductRepository.GetAllAsync();
-            return Ok(new
+
+            var currentDate = CommonHelpers.GetBangladeshTimeZone(DateTime.UtcNow);
+
+            var filteredList = string.IsNullOrWhiteSpace(ProductName)
+                ? productList
+                : productList.Where(p => p.ProductName.Contains(ProductName, StringComparison.OrdinalIgnoreCase));
+
+            var result = filteredList.Select(p => new
             {
-                Data = productList
+                p.Id,
+                p.ProductName,
+                p.ProductPrice,
+                p.ProductSlug,
+                p.ProductImage,
+                p.DiscountStartDate,
+                p.DiscountEndDate,
+                ProductDiscountedPrice = (
+                    p.DiscountStartDate.HasValue && p.DiscountEndDate.HasValue &&
+                    CommonHelpers.GetBangladeshTimeZone(p.DiscountStartDate.Value) <= currentDate &&
+                    CommonHelpers.GetBangladeshTimeZone(p.DiscountEndDate.Value) >= currentDate
+                )
+                ? Math.Round(p.ProductPrice * 0.75m, 2)
+                : (decimal?)null
             });
+            return Ok(new { Data = result });
         }
+
         [HttpPost]
         [Route("SaveProduct")]
-        public async Task<IActionResult> SaveProductsAsync([FromForm] Product model)
+        public async Task<IActionResult> SaveProductsAsync([FromForm] Products model)
         {
             try
             {
-
                 if (model.File != null)
                 {
-                    var fileDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Product Images");
+                    var fileDirectory = Path.Combine(Directory.GetCurrentDirectory(), "ProductImages");
 
                     if (!Directory.Exists(fileDirectory))
                     {
@@ -50,12 +72,19 @@ namespace ProductCart.API.Controllers
                     }
 
                     model.ProductImage = uniqueFileName;
-                    model.ProductImage = Path.Combine("Product Images", uniqueFileName);
+                    model.ProductImage = Path.Combine("ProductImages", uniqueFileName);
                 }
+                if (model.DiscountStartDate.HasValue)
+                    model.DiscountStartDate = CommonHelpers.GetBangladeshTimeZone(model.DiscountStartDate.Value);
+
+                if (model.DiscountEndDate.HasValue)
+                    model.DiscountEndDate = CommonHelpers.GetBangladeshTimeZone(model.DiscountEndDate.Value);
+
+
 
                 await _context.ProductRepository.AddAsync(model);
                 await _context.CommitAsync();
-                
+
                 return Ok(new
                 {
                     Status = true,
@@ -71,6 +100,5 @@ namespace ProductCart.API.Controllers
                 });
             }
         }
-
     }
 }

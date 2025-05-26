@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ProductCart.Services
 {
-    public class ProductRepository : GenericRepository<Product>, IProductRepository
+    public class ProductRepository : GenericRepository<Products>, IProductRepository
     {
         protected readonly ApplicationDbContext _productDb;
 
@@ -18,10 +18,10 @@ namespace ProductCart.Services
             _productDb = productDb;
         }
 
-        public void Update(Product product)
+        public void Update(Products product)
         => _productDb.Update(product);
 
-        public void UpdateRange(IEnumerable<Product> products)
+        public void UpdateRange(IEnumerable<Products> products)
         => _productDb.UpdateRange(products);
     }
 }

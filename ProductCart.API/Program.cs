@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using ProductCart.Infrastructure;
 using ProductCart.Interfaces;
 using ProductCart.Services;
@@ -33,6 +34,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(Directory.GetCurrentDirectory(), "ProductImages")),
+    RequestPath = "/ProductImages"
+});
 
 app.UseAuthorization();
 
