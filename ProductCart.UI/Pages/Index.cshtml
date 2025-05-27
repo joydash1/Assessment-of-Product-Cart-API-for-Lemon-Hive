@@ -149,8 +149,9 @@
     }
 
     .add-to-cart-btn {
-        background-color: #2F80ED;
-        color: white;
+        /* background-color: #2F80ED; */
+        background-color: #white;
+        color: black;
         border: none;
         border-radius: 6px;
         padding: 10px 16px;
@@ -185,8 +186,8 @@
         width: 100%;
     }
     /* .custom-modal-size .modal-content {
-                height: 597px;
-            } */
+                    height: 597px;
+                } */
 
 </style>
 
@@ -243,52 +244,25 @@
             </button>
         </div>
     </div>
-    
+
+    <div class="row g-4 mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div id="product-count-info"></div>
+        </div>
+    </div>
+
     <div class="row g-4 mb-4" id="cardDiv">
         <div class="col-12 col-md-6 col-lg-3 d-flex justify-content-center">
             <div class="card product-card">
-                @* <div class="product-image-container">
-                    <img src="https://images.pexels.com/photos/336232/pexels-photo-336232.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="card-img-top product-image" alt="DJI Phantom 2 Vision+" id="imgProductImage">
-                </div>
-                <div class="card-body">
-                    <h5 class="product-title" id="spnProductName">DJI Phantom 2 Vision+</h5>
-                    <div class="price-container">
-                        <span class="product-price" id="spnDiscountedPrice">$499</span>
-                        <span class="product-old-price" id="spnMainPrice">$599</span>
-                    </div>
-                    <button class="btn add-to-cart-btn">Add to cart</button>
-                </div> *@
+               
             </div>
         </div>
     </div>
     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-end">
-                <div class="pagination-container">
-                    <nav aria-label="Page navigation">
-                        <ul class="pagination">
-                            <li class="page-item disabled">
-                                <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Prev</a>
-                            </li>
-                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                            <li class="page-item"><a class="page-link" href="#">2</a></li>
-                            <li class="page-item"><a class="page-link" href="#">3</a></li>
-                            <li class="page-item"><a class="page-link" href="#">4</a></li>
-                            <li class="page-item"><a class="page-link" href="#">5</a></li>
-                            <li class="page-item"><a class="page-link" href="#">6</a></li>
-                            <li class="page-item"><a class="page-link" href="#">7</a></li>
-                            <li class="page-item disabled">
-                                <span class="page-link">...</span>
-                            </li>
-                            <li class="page-item"><a class="page-link" href="#">20</a></li>
-                            <li class="page-item">
-                                <a class="page-link" href="#">Next</a>
-                            </li>
-                        </ul>
-                    </nav>
-                    @*  <div class="per-page-selector">
-                        <span>10 per page</span>
-                    </div> *@
+                <div id="pagination-container" class="mt-4 d-flex justify-content-center">
+
                 </div>
             </div>
         </div>
@@ -345,10 +319,37 @@
     </div>
 </div>
 
+<div class="modal fade" id="ProductCardModal" tabindex="-1" aria-labelledby="ProductCardModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-end modal-lg" style="margin-left: auto;margin-right: 0;">
+        <div class="modal-content" style="height: 100vh; padding: 64px;border-radius: 0;overflow-y: auto;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold fs-2">Shopping Cart</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <div class="cart-item d-flex justify-content-between align-items-start py-3 border-bottom">
+                    <div class="d-flex gap-3">
+                        <img src="https://images.pexels.com/photos/336232/pexels-photo-336232.jpeg?cs=srgb&dl=pexels-inmortal-producciones-108299-336232.jpg&fm=jpg" alt="Product" width="60" height="60" class="rounded">
+                        <div>
+                            <div class="fw-semibold">DJI Phantom 2 Vision+</div>
+                            <div class="text-muted small">Qty: 1</div>
+                        </div>
+                    </div>
+                    <div class="fw-semibold">$499.00</div>
+                </div>
+            </div>
+            <div class="modal-footer justify-content-between border-0 pt-4">
+                <div class="text-muted fs-5">Subtotal</div>
+                <div class="fw-bold fs-4">$2124.00</div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script type="text/javascript">
         const apiUrl = '@Model.ApiUrl';
-        
+        const cartDetails = [];
         $(document).ready(function () {
 
             $('#btnProductSave').click(function () {
@@ -366,45 +367,39 @@
                     formData.append('File', fileInput.files[0]);
                 }
 
-                $.ajax({
-                    url: apiUrl + "api/Products/SaveProduct",
-                    type: 'POST',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function (res) {
-                        if (res.status) {
-                            Swal.fire({
-                                icon: 'success',
-                                title: 'Success',
-                                text: res.message,
-                            });
-                            window.location.reload();
-                            // $('#txtProductName').val('');
-                            // $('#txtProductSlug').val('');
-                            // $('#txtProductPrice').val('');
-                            // $('#txtDiscountDateFrom').val('');
-                            // $('#txtDiscountTo').val('');
-                            // $('#fileProductImage').val('');
-                            // $('#addProductModal').modal('hide');
-                        } else {
+                  $.ajax({
+                        url: apiUrl + "api/Products/SaveProduct",
+                        type: 'POST',
+                        data: formData,
+                        contentType: false,
+                        processData: false,
+                        success: function (res) {
+                            if (res.status) {
+                                Swal.fire({
+                                  icon: 'success',
+                                  title: 'Success',
+                                  text: res.message,
+                                }).then(() => {
+                                  window.location.reload();
+                                });
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: res.message,
+                                });
+                            }
+                        },
+                        error: function (err) {
                             Swal.fire({
                                 icon: 'error',
-                                title: 'Error',
-                                text: res.message,
+                                title: 'Oops...',
+                                text: 'An unexpected error occurred.',
                             });
                         }
-                    },
-                    error: function (err) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Oops...',
-                            text: 'An unexpected error occurred.',
-                        });
-                    }
-                });
+                  });
             });
-            
+
             $(document).on('click','#btnSlugAction', function() {
               const input = $('#txtProductSlug');
               const originalText = input.val();
@@ -430,31 +425,28 @@
                     $('#btnSearchProduct').click();
                 }
             });
-            
+
             getAllProductList();
         });
 
-        function getAllProductList(productName = ""){
-             $.ajax({
-                url: apiUrl + "api/Products/GetProductList?ProductName=" + productName,
+        function getAllProductList(productName = "", page = 1, pageSize = 8) {
+            $.ajax({
+                url: apiUrl + "api/Products/GetProductList?ProductName=" +  productName + "&page=" + page + "&pageSize=" + pageSize,
                 method: "GET",
                 success: function (response) {
-                    let products = response.data;
-                    console.log(products);
+                    console.log(response);
+                    let products = response.data.items;
+                    let totalCount = response.data.totalCount;
                     let html = "";
+
                     products.forEach(function (product) {
                         let hasDiscount = product.productDiscountedPrice !== null;
-
                         let productImagePath = apiUrl + product.productImage.replace(/\\/g, "/").replace(/ /g, "%20");
-
-                        console.log(productImagePath);
 
                         html += ` <div class="col-12 col-md-6 col-lg-3 d-flex justify-content-center">
                                      <div class="card product-card">
                                         <div class="product-image-container">
-                                            <img src="${productImagePath}"
-                                                 class="card-img-top product-image"
-                                                 alt="${product.productName}" />
+                                            <img src="${productImagePath}" class="card-img-top product-image" alt="${product.productName}" />
                                          </div>
                                          <div class="card-body">
                                             <h5 class="product-title">${product.productName}</h5>
@@ -464,13 +456,25 @@
                                                 </span>
                                                 ${hasDiscount ? `<span class="product-old-price">$${product.productPrice.toFixed(2)}</span>` : ''}
                                             </div>
-                                            <button class="btn add-to-cart-btn">Add to cart</button>
+                                            <div class="quantity-selector d-flex align-items-center justify-content-between bg-primary text-white rounded px-2 py-1 my-2 mt-2" style="width: 108px;">
+                                                <button class="btn btn-sm text-white fw-bold px-2" onclick="decreaseQuantity(this)" type="button">−</button>
+                                                <span class="mx-2 quantity-value">1</span>
+                                                <button class="btn btn-sm text-white fw-bold px-2" onclick="increaseQuantity(this)" type="button">+</button>
+                                            </div>
+                                            <button class="btn add-to-cart-btn" data-productid="${product.id}" onclick="addToCart(this)">Add to cart</button>
                                          </div>
                                      </div>
                                   </div>`;
                     });
 
                     $("#cardDiv").html(html);
+
+                    let showingFrom = (page - 1) * pageSize + 1;
+                    let showingTo = showingFrom + products.length - 1;
+                    $("#product-count-info").html(`Showing ${showingFrom} – ${showingTo} of ${totalCount} results`);
+
+                    let totalPages = Math.ceil(totalCount / pageSize);
+                    renderPaginationControls(page, totalPages);
                 },
                 error: function (xhr) {
                     alert("Failed to load products");
@@ -478,21 +482,110 @@
                 }
             });
         }
-        
+
+
+
         function createSlug(text) {
           return text
             .toLowerCase()
             .trim()
-            .replace(/[^\w\s-]/g, '')   
-            .replace(/\s+/g, '-')     
+            .replace(/[^\w\s-]/g, '')
+            .replace(/\s+/g, '-')
             .replace(/-+/g, '-');
         }
 
         function generateUniqueSlug(text) {
           const slug = createSlug(text);
           const uniqueSuffix = Math.random().toString(36).substring(2, 7);
-          return `${slug}-${uniqueSuffix}`;
+          return `${slug}`;
         }
 
+        function renderPaginationControls(currentPage, totalPages) {
+            let paginationHtml = `<ul class="pagination">`;
+
+            if (currentPage > 1) {
+                paginationHtml += `<li class="page-item">
+                    <a class="page-link" href="#" onclick="getAllProductList('', ${currentPage - 1})">Prev</a>
+                </li>`;
+            } else {
+                paginationHtml += `<li class="page-item disabled"><span class="page-link">Prev</span></li>`;
+            }
+           
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHtml += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" onclick="getAllProductList('', ${i})">${i}</a>
+                </li>`;
+            }
+
+           
+            if (currentPage < totalPages) {
+                paginationHtml += `<li class="page-item">
+                    <a class="page-link" href="#" onclick="getAllProductList('', ${currentPage + 1})">Next</a>
+                </li>`;
+            } else {
+                paginationHtml += `<li class="page-item disabled"><span class="page-link">Next</span></li>`;
+            }
+
+            paginationHtml += `</ul>`;
+           
+            $('#pagination-container').html(paginationHtml);
+        }
+       function increaseQuantity(button) {
+            const quantitySpan = button.parentElement.querySelector('.quantity-value');
+            let qty = parseInt(quantitySpan.innerText);
+            quantitySpan.innerText = qty + 1;
+        }
+
+        function decreaseQuantity(button) {
+            const quantitySpan = button.parentElement.querySelector('.quantity-value');
+            let qty = parseInt(quantitySpan.innerText);
+            if (qty > 1) {
+                quantitySpan.innerText = qty - 1;
+            }
+        }
+
+       function increaseQuantity(button) {
+            const quantitySpan = button.parentElement.querySelector('.quantity-value');
+            let qty = parseInt(quantitySpan.innerText);
+            quantitySpan.innerText = qty + 1;
+        }
+
+        function decreaseQuantity(button) {
+            const quantitySpan = button.parentElement.querySelector('.quantity-value');
+            let qty = parseInt(quantitySpan.innerText);
+            if (qty > 1) {
+                quantitySpan.innerText = qty - 1;
+            }
+        }
+        function addToCart(button) {
+            const id = button.attr("data-productid");
+            const card = button.closest('.product-card');
+            const productName = card.querySelector('.product-title').innerText;
+            const quantity = parseInt(card.querySelector('.quantity-value').innerText);
+            const priceText = card.querySelector('.product-price').innerText.replace('$', '');
+            const price = parseFloat(priceText);
+            const image = card.querySelector('.product-image').getAttribute('src');
+
+            const existingItemIndex = cartDetails.findIndex(item => item.productName === productName);
+
+            if (existingItemIndex !== -1) {
+                cartDetails[existingItemIndex].quantity += quantity;
+                cartDetails[existingItemIndex].total = cartDetails[existingItemIndex].quantity * price;
+            } else {
+                cartDetails.push({
+                    productId : id,
+                    productName: productName,
+                    quantity: quantity,
+                    price: price,
+                    image: image,
+                    total: quantity * price
+                });
+            }
+
+            console.log(cartDetails);
+        }
     </script>
 }

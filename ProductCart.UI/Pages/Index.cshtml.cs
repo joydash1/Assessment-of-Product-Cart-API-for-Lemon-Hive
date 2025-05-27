@@ -20,5 +20,6 @@ namespace ProductCart.UI.Pages
         {
             ApiUrl = _configuration.GetValue<string>("ApiUrl");
         }
+
     }
 }

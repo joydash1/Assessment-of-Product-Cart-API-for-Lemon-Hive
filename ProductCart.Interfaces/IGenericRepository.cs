@@ -32,5 +32,8 @@ namespace ProductCart.Interfaces
         Task AddAsync(T entity, CancellationToken cancellationToken = default);
 
         Task AddRangeAsync(IEnumerable<T> entities, CancellationToken cancellationToken = default);
+
+        IQueryable<T> Query();
+
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductCart.Infrastructure.Domains;
 using ProductCart.Interfaces;
 using ProductCart.Services;
@@ -17,38 +18,49 @@ namespace ProductCart.API.Controllers
         {
             _context = context;
         }
-
         [HttpGet]
         [Route("GetProductList")]
-        public async Task<IActionResult> GetAllProductsListAsync(string? ProductName = "")
+        public async Task<IActionResult> GetAllProductsListAsync(string? ProductName = "", int page = 1, int pageSize = 8)
         {
-            var productList = await _context.ProductRepository.GetAllAsync();
+            var query = _context.ProductRepository.Query();
 
-            var currentDate = CommonHelpers.GetBangladeshTimeZone(DateTime.UtcNow);
+            if (!string.IsNullOrWhiteSpace(ProductName))
+                query = query.Where(p => p.ProductName.Contains(ProductName));
 
-            var filteredList = string.IsNullOrWhiteSpace(ProductName)
-                ? productList
-                : productList.Where(p => p.ProductName.Contains(ProductName, StringComparison.OrdinalIgnoreCase));
+            var totalCount = await query.CountAsync();
 
-            var result = filteredList.Select(p => new
+            var currentDate = DateTime.Now;
+
+            var products = await query
+                .OrderByDescending(p => p.Id)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(p => new
+                {
+                    p.Id,
+                    p.ProductName,
+                    p.ProductPrice,
+                    p.ProductSlug,
+                    p.ProductImage,
+                    p.DiscountStartDate,
+                    p.DiscountEndDate,
+                    ProductDiscountedPrice =
+                        (p.DiscountStartDate <= currentDate && p.DiscountEndDate >= currentDate)
+                            ? Math.Round(p.ProductPrice * 0.75m, 2)
+                            : (decimal?)null
+                })
+                .ToListAsync();
+
+            return Ok(new
             {
-                p.Id,
-                p.ProductName,
-                p.ProductPrice,
-                p.ProductSlug,
-                p.ProductImage,
-                p.DiscountStartDate,
-                p.DiscountEndDate,
-                ProductDiscountedPrice = (
-                    p.DiscountStartDate.HasValue && p.DiscountEndDate.HasValue &&
-                    CommonHelpers.GetBangladeshTimeZone(p.DiscountStartDate.Value) <= currentDate &&
-                    CommonHelpers.GetBangladeshTimeZone(p.DiscountEndDate.Value) >= currentDate
-                )
-                ? Math.Round(p.ProductPrice * 0.75m, 2)
-                : (decimal?)null
+                Data = new
+                {
+                    Items = products,
+                    TotalCount = totalCount
+                }
             });
-            return Ok(new { Data = result });
         }
+
 
         [HttpPost]
         [Route("SaveProduct")]
@@ -74,13 +86,6 @@ namespace ProductCart.API.Controllers
                     model.ProductImage = uniqueFileName;
                     model.ProductImage = Path.Combine("ProductImages", uniqueFileName);
                 }
-                if (model.DiscountStartDate.HasValue)
-                    model.DiscountStartDate = CommonHelpers.GetBangladeshTimeZone(model.DiscountStartDate.Value);
-
-                if (model.DiscountEndDate.HasValue)
-                    model.DiscountEndDate = CommonHelpers.GetBangladeshTimeZone(model.DiscountEndDate.Value);
-
-
 
                 await _context.ProductRepository.AddAsync(model);
                 await _context.CommitAsync();

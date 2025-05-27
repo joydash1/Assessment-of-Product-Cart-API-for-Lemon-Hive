@@ -56,5 +56,10 @@ namespace ProductCart.Services
 
         public void RemoveRange(IEnumerable<T> entities)
             => _dbContext.RemoveRange(entities);
+
+        public IQueryable<T> Query()
+        {
+            return _dbSet.AsQueryable();
+        }
     }
 }
