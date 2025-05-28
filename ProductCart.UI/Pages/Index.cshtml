@@ -258,6 +258,7 @@
             </div>
         </div>
     </div>
+    
     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-end">
@@ -319,28 +320,17 @@
     </div>
 </div>
 
-<div class="modal fade" id="ProductCardModal" tabindex="-1" aria-labelledby="ProductCardModalLabel" aria-hidden="true">
+<div class="modal fade" id="ProductCardModal" tabindex="-1" aria-labelledby="ProductCardModalLabel">
     <div class="modal-dialog modal-dialog-end modal-lg" style="margin-left: auto;margin-right: 0;">
         <div class="modal-content" style="height: 100vh; padding: 64px;border-radius: 0;overflow-y: auto;">
             <div class="modal-header border-0">
                 <h5 class="modal-title fw-bold fs-2">Shopping Cart</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body pt-0">
-                <div class="cart-item d-flex justify-content-between align-items-start py-3 border-bottom">
-                    <div class="d-flex gap-3">
-                        <img src="https://images.pexels.com/photos/336232/pexels-photo-336232.jpeg?cs=srgb&dl=pexels-inmortal-producciones-108299-336232.jpg&fm=jpg" alt="Product" width="60" height="60" class="rounded">
-                        <div>
-                            <div class="fw-semibold">DJI Phantom 2 Vision+</div>
-                            <div class="text-muted small">Qty: 1</div>
-                        </div>
-                    </div>
-                    <div class="fw-semibold">$499.00</div>
-                </div>
-            </div>
+            <div class="modal-body pt-0" id="cart-items-container"></div>
             <div class="modal-footer justify-content-between border-0 pt-4">
                 <div class="text-muted fs-5">Subtotal</div>
-                <div class="fw-bold fs-4">$2124.00</div>
+                <div class="fw-bold fs-4" id="cart-subtotal">$0.00</div>
             </div>
         </div>
     </div>
@@ -434,7 +424,7 @@
                 url: apiUrl + "api/Products/GetProductList?ProductName=" +  productName + "&page=" + page + "&pageSize=" + pageSize,
                 method: "GET",
                 success: function (response) {
-                    console.log(response);
+                    //console.log(response);
                     let products = response.data.items;
                     let totalCount = response.data.totalCount;
                     let html = "";
@@ -496,7 +486,6 @@
 
         function generateUniqueSlug(text) {
           const slug = createSlug(text);
-          const uniqueSuffix = Math.random().toString(36).substring(2, 7);
           return `${slug}`;
         }
 
@@ -533,7 +522,8 @@
            
             $('#pagination-container').html(paginationHtml);
         }
-       function increaseQuantity(button) {
+        
+        function increaseQuantity(button) {
             const quantitySpan = button.parentElement.querySelector('.quantity-value');
             let qty = parseInt(quantitySpan.innerText);
             quantitySpan.innerText = qty + 1;
@@ -547,7 +537,7 @@
             }
         }
 
-       function increaseQuantity(button) {
+        function increaseQuantity(button) {
             const quantitySpan = button.parentElement.querySelector('.quantity-value');
             let qty = parseInt(quantitySpan.innerText);
             quantitySpan.innerText = qty + 1;
@@ -560,32 +550,71 @@
                 quantitySpan.innerText = qty - 1;
             }
         }
+        
         function addToCart(button) {
-            const id = button.attr("data-productid");
             const card = button.closest('.product-card');
-            const productName = card.querySelector('.product-title').innerText;
-            const quantity = parseInt(card.querySelector('.quantity-value').innerText);
-            const priceText = card.querySelector('.product-price').innerText.replace('$', '');
-            const price = parseFloat(priceText);
+            const id = button.getAttribute("data-productid");
+            const name = card.querySelector('.product-title').textContent.trim();
             const image = card.querySelector('.product-image').getAttribute('src');
+            const quantity = parseInt(card.querySelector('.quantity-value').textContent.trim());
+            const price = parseFloat(card.querySelector('.product-price').textContent.replace('$', ''));
 
-            const existingItemIndex = cartDetails.findIndex(item => item.productName === productName);
-
-            if (existingItemIndex !== -1) {
-                cartDetails[existingItemIndex].quantity += quantity;
-                cartDetails[existingItemIndex].total = cartDetails[existingItemIndex].quantity * price;
+          
+            const existingItem = cartDetails.find(item => item.id === id);
+            if (existingItem) {
+                existingItem.quantity += quantity;
             } else {
                 cartDetails.push({
-                    productId : id,
-                    productName: productName,
-                    quantity: quantity,
-                    price: price,
-                    image: image,
-                    total: quantity * price
+                    id,
+                    name,
+                    image,
+                    price,
+                    quantity
                 });
             }
 
-            console.log(cartDetails);
+            updateCartModal();
+            updateCartCount();
+            //showCartModal();
         }
+
+        function updateCartModal() {
+            const container = document.getElementById('cart-items-container');
+            const subtotalElement = document.getElementById('cart-subtotal');
+            container.innerHTML = '';
+
+            let subtotal = 0;
+
+            cartDetails.forEach(item => {
+                const itemTotal = item.quantity * item.price;
+                subtotal += itemTotal;
+
+                const itemHTML = `
+                    <div class="d-flex align-items-center mb-3">
+                        <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
+                        <div>
+                            <h6 class="mb-1">${item.name}</h6>
+                            <small>${item.quantity} × $${item.price.toFixed(2)}</small>
+                        </div>
+                        <div class="ms-auto fw-bold">$${itemTotal.toFixed(2)}</div>
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', itemHTML);
+            });
+
+            subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+        }
+
+        function showCartModal() {
+            const modalElement = document.getElementById('ProductCardModal');
+            const bsModal = bootstrap.Modal.getOrCreateInstance(modalElement);
+            bsModal.show();
+        }
+
+        function updateCartCount() {
+            const totalUniqueItems = cartDetails.length;
+            document.getElementById('cart-count').textContent = `(${totalUniqueItems})`;
+        }
+
     </script>
 }
