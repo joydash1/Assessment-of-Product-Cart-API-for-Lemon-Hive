@@ -8,7 +8,7 @@ using ProductCart.Shared.Helpers;
 
 namespace ProductCart.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class ProductsController : ControllerBase
     {
@@ -18,6 +18,7 @@ namespace ProductCart.API.Controllers
         {
             _context = context;
         }
+
         [HttpGet]
         [Route("GetProductList")]
         public async Task<IActionResult> GetAllProductsListAsync(string? ProductName = "", int page = 1, int pageSize = 8)
@@ -60,7 +61,6 @@ namespace ProductCart.API.Controllers
                 }
             });
         }
-
 
         [HttpPost]
         [Route("SaveProduct")]

@@ -358,7 +358,7 @@
                 }
 
                   $.ajax({
-                        url: apiUrl + "api/Products/SaveProduct",
+                        url: apiUrl + "Products/SaveProduct",
                         type: 'POST',
                         data: formData,
                         contentType: false,
@@ -421,7 +421,7 @@
 
         function getAllProductList(productName = "", page = 1, pageSize = 8) {
             $.ajax({
-                url: apiUrl + "api/Products/GetProductList?ProductName=" +  productName + "&page=" + page + "&pageSize=" + pageSize,
+                url: apiUrl + "Products/GetProductList?ProductName=" +  productName + "&page=" + page + "&pageSize=" + pageSize,
                 method: "GET",
                 success: function (response) {
                     //console.log(response);
