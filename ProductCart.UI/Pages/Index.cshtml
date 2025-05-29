@@ -231,7 +231,7 @@
     <div class="row g-4 mb-4 align-items-center">
         <div class="col-12 col-md-8">
             <div class="input-group search-box">
-                <input type="text" class="form-control" placeholder="Search product..." id="txtSearchProduct" />
+                <input type="text" class="form-control" placeholder="Search product by name ........" id="txtSearchProduct" />
                 <span class="input-group-text" id="btnSearchProduct" style="cursor: pointer;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
@@ -250,7 +250,7 @@
         </div>
     </div>
 
-    <div class="row g-4 mb-4" id="cardDiv" @* style="height:789px; width:auto;" *@>
+    <div class="row g-4 mb-4" id="cardDiv">
         <div class="col-12 col-md-6 col-lg-3 d-flex justify-content-center">
             <div class="card product-card">
                
@@ -258,7 +258,7 @@
         </div>
     </div>
     
-    <div class="row g-4 mb-4">
+     <div class="row g-4 mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-end">
                 <div id="pagination-container" class="mt-4 d-flex justify-content-center">
@@ -266,7 +266,8 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> 
+
 </div>
 
 <div class="modal fade custom-modal-size" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
@@ -458,12 +459,15 @@
 
                     $("#cardDiv").html(html);
 
-                    let showingFrom = (page - 1) * pageSize + 1;
-                    let showingTo = showingFrom + products.length - 1;
-                    $("#product-count-info").html(`Showing ${showingFrom} – ${showingTo} of ${totalCount} results`);
-
                     let totalPages = Math.ceil(totalCount / pageSize);
-                    renderPaginationControls(page, totalPages);
+                   
+                    if(totalPages != 0)
+                    {
+                       let showingFrom = (page - 1) * pageSize + 1;
+                       let showingTo = showingFrom + products.length - 1;
+                       $("#product-count-info").html(`Showing ${showingFrom} – ${showingTo} of ${totalCount} results`);
+                       renderPaginationControls(page, totalPages);
+                    }
                 },
                 error: function (xhr) {
                     alert("Failed to load products");
