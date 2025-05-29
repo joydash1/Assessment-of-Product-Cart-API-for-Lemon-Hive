@@ -149,9 +149,8 @@
     }
 
     .add-to-cart-btn {
-        /* background-color: #2F80ED; */
-        background-color: #white;
-        color: black;
+        background-color: #2F80ED;
+        color: white;
         border: none;
         border-radius: 6px;
         padding: 10px 16px;
@@ -251,7 +250,7 @@
         </div>
     </div>
 
-    <div class="row g-4 mb-4" id="cardDiv">
+    <div class="row g-4 mb-4" id="cardDiv" @* style="height:789px; width:auto;" *@>
         <div class="col-12 col-md-6 col-lg-3 d-flex justify-content-center">
             <div class="card product-card">
                
@@ -494,10 +493,10 @@
 
             if (currentPage > 1) {
                 paginationHtml += `<li class="page-item">
-                    <a class="page-link" href="#" onclick="getAllProductList('', ${currentPage - 1})">Prev</a>
+                    <a class="page-link" href="#" onclick="getAllProductList('', ${currentPage - 1})"><i class="fa-solid fa-arrow-left"></i> Prev</a>
                 </li>`;
             } else {
-                paginationHtml += `<li class="page-item disabled"><span class="page-link">Prev</span></li>`;
+                paginationHtml += `<li class="page-item disabled"><span class="page-link"><i class="fa-solid fa-arrow-left"></i> Prev</span></li>`;
             }
            
             let startPage = Math.max(1, currentPage - 2);
@@ -512,10 +511,10 @@
            
             if (currentPage < totalPages) {
                 paginationHtml += `<li class="page-item">
-                    <a class="page-link" href="#" onclick="getAllProductList('', ${currentPage + 1})">Next</a>
+                    <a class="page-link" href="#" onclick="getAllProductList('', ${currentPage + 1})">Next <i class="fa-solid fa-arrow-right"></i></a>
                 </li>`;
             } else {
-                paginationHtml += `<li class="page-item disabled"><span class="page-link">Next</span></li>`;
+                paginationHtml += `<li class="page-item disabled"><span class="page-link">Next <i class="fa-solid fa-arrow-right"></i></span></li>`;
             }
 
             paginationHtml += `</ul>`;
@@ -594,7 +593,7 @@
                         <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; object-fit: cover;" class="me-3 rounded">
                         <div>
                             <h6 class="mb-1">${item.name}</h6>
-                            <small>${item.quantity} × $${item.price.toFixed(2)}</small>
+                            <small>Qty : ${item.quantity} × ${item.price.toFixed(2)}</small>
                         </div>
                         <div class="ms-auto fw-bold">$${itemTotal.toFixed(2)}</div>
                     </div>
