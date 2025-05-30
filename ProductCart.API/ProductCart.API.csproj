@@ -25,4 +25,8 @@
     <ProjectReference Include="..\ProductCart.Services\ProductCart.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="ProductImages\" />
+  </ItemGroup>
+
 </Project>
